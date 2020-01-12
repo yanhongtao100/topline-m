@@ -18,3 +18,19 @@ export const getSmsCode = mobile => {
 
   })
 }
+// 获取当前用户信息
+export const getUserInfo = () => {
+  return request({
+    method: 'get',
+    url: `/app/v1_0/user`
+
+  })
+}
+// 获取指定用户信息
+export const getUserById = (userId) => {
+  return request({
+    method: 'get',
+    url: `/app/v1_0/users/${userId}`
+
+  })
+}

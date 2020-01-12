@@ -1,16 +1,16 @@
 <template>
   <div class="login-container">
     <van-nav-bar title="登录" />
-    <ValidationObserver>
+    <ValidationObserver ref="form">
 
-<ValidationProvider name="手机号" rules="">
+<ValidationProvider name="手机号" rules="required|mobile" immediate >
  <van-field clearable v-model="user.mobile" placeholder="请输入手机号">
         <i class="icon icon-shoujihao" slot="left-icon"></i>
       </van-field>
       <span></span>
 </ValidationProvider>
 
-<ValidationProvider>
+<ValidationProvider name="验证码" rules="required|code" immediate>
       <van-field placeholder="请输入验证码" v-model="user.code">
         <i class="icon icon-yanzhengma" slot="left-icon"></i>
         <van-button
@@ -41,6 +41,7 @@
 
 <script>
 import { login, getSmsCode } from '@/api/user'
+import { validate } from 'vee-validate'
 export default {
   name: 'LoginPage',
   components: {},
@@ -62,7 +63,26 @@ export default {
       // 1获取表单数据
       const user = this.user
       // 2.表单验证
+      // this.$refs.form.validate().then(success => {
+      //   if (!success) {
+      //     // 表单验证失败处理
+      //   } else {
+      //     // 表单验证通过处理
+      //   }
+      // })
+      const success = await this.$refs.form.validate()
 
+      if (!success) {
+        const error = this.$refs.form.errors
+        for (let key in error) {
+          const item = error[key]
+          if (item[0]) {
+            this.$toast(item[0])
+            return
+          }
+        }
+        return
+      }
       // 3.开启登录loading
       this.$toast.loading({
         duration: 0, // 0为持续展示toast
@@ -73,8 +93,13 @@ export default {
       //   5.0
       try {
         const result = await login(user)
-        console.log(result)
+
+        const { data } = result
+        this.$store.commit('setUser', data.data)
         this.$toast.success('登录成功')
+
+        // 跳转到首页
+        this.$router.push('/')
       } catch (error) {
         console.log(error)
         this.$toast.fail('登录失败')
@@ -82,9 +107,18 @@ export default {
     },
     async onSendSmsCode () {
       try {
-        // 1.验证手机号
-      // 2.请求验证码
         let { mobile } = this.user
+        // 1.验证手机号
+        const validateResult = await validate(mobile, 'required|mobile', {
+          name: '手机号'
+        })
+
+        // 如果验证失败，提示错误消息，停止发送验证码
+        if (!validateResult.valid) {
+          this.$toast(validateResult.errors[0])
+          return
+        }
+        // 2.请求验证码
         const res = await getSmsCode(mobile)
         console.log(res)
         this.isCountDownShow = true
