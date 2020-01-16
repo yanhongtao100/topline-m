@@ -48,6 +48,12 @@ const routes = [
     name: 'serach',
     component: () => import('@/views/search')
 
+  },
+  {
+    path: '/article/:articleId',
+    name: 'article',
+    component: () => import('@/views/article'),
+    props: true// 讲路由参数动态映射到组建的props中
   }
 
 ]

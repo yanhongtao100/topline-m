@@ -87,7 +87,7 @@ export default {
       this.$toast.loading({
         duration: 0, // 0为持续展示toast
         message: '登录中',
-        foebidClick: true // 是否禁止北京点击
+        forbidClick: true // 是否禁止北京点击
       })
       // 4.请求登录
       //   5.0
