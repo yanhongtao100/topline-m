@@ -8,3 +8,11 @@ export const getComments = (params) => {
     params
   })
 }
+// 发布评论
+export const addComment = (data) => {
+  return request({
+    method: 'post',
+    url: `/app/v1_0/comments`,
+    data
+  })
+}

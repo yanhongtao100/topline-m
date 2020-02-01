@@ -102,7 +102,7 @@
   position="bottom"
   :style="{ height: '20%' }"
 >
-<post-comment></post-comment>
+<post-comment v-model="postMessage" @click-post="onPost"></post-comment>
 </van-popup>
     <!-- 弹层 -->
   </div>
@@ -120,6 +120,8 @@ import { mapState } from 'vuex'
 import { deleteFollow, addFollow } from '@/api/user'
 import ArticleComment from './components/article-commentes'
 import PostComment from './components/post-comment'
+import { addComment } from '@/api/comment'
+
 export default {
   name: 'ArticlePage',
   components: {
@@ -137,7 +139,8 @@ export default {
       article: {}, // 文章详情
       loading: true, // 文章加载中的状态
       isFollowLoading: false,
-      isPostShow: false
+      isPostShow: false,
+      postMessage: ''
     }
   },
   computed: {
@@ -216,6 +219,22 @@ export default {
         this.$toast.fail('操作失败')
       }
       this.isFollowLoading = false
+    },
+    async onPost () {
+      try {
+        const { data } = await addComment({
+          target: this.articleId,
+          content: this.postMessage
+        })
+        console.log(data)
+        this.$toast.success('发布成功')
+        this.postMessage = ''
+        this.isPostShow = false
+      } catch (error) {
+        this.$toast.success('发布失败')
+        this.postMessage = ''
+        this.isPostShow = false
+      }
     }
   }
 }

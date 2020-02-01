@@ -1,7 +1,8 @@
 <template>
   <div class="post-comment">
     <van-field
-      v-model="message"
+      :value="value"
+      @input="$emit('input',$event)"
       rows="2"
       autosize
       type="textarea"
@@ -9,7 +10,12 @@
       placeholder="请输入留言"
       show-word-limit
     />
-    <van-button size="small" type="primary" class="post-btn">发布</van-button>
+    <van-button
+     size="small"
+      type="primary"
+       class="post-btn"
+       @click="$emit('click-post')"
+       >发布</van-button>
   </div>
 </template>
 
@@ -17,7 +23,12 @@
 export default {
   name: 'PostComment',
   components: {},
-  props: {},
+  props: {
+    value: {
+      type: String,
+      required: true
+    }
+  },
   data () {
     return {
       message: ''
@@ -28,7 +39,9 @@ export default {
   activited () {},
   update () {},
   beforeRouteUpdate () {},
-  methods: {},
+  methods: {
+
+  },
   filter: {},
   computed: {},
   watch: {}
