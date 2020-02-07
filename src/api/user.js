@@ -53,3 +53,27 @@ export const deleteFollow = (userId) => {
 
   })
 }
+export const getUserProfile = () => {
+  return request({
+    method: 'get',
+    url: `/app/v1_0/user/profile`
+
+  })
+}
+// 更新用户头像
+export const updataUserPhoto = (data) => {
+  return request({
+    method: 'PATCH',
+    url: `/app/v1_0/user/photo`,
+    data
+
+  })
+}
+// 更新用户资料
+export const updateUserProfile = (data) => {
+  return request({
+    method: 'PATCH',
+    url: `/app/v1_0/user/profile`,
+    data
+  })
+}

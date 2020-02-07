@@ -99,9 +99,9 @@ export default {
         this.$toast.success('登录成功')
 
         // 跳转到首页
-        this.$router.push('/')
+        const redirect = this.$route.query.redirect || '/'
+        this.$router.push(redirect)
       } catch (error) {
-        console.log(error)
         this.$toast.fail('登录失败')
       }
     },
@@ -119,8 +119,7 @@ export default {
           return
         }
         // 2.请求验证码
-        const res = await getSmsCode(mobile)
-        console.log(res)
+        await getSmsCode(mobile)
         this.isCountDownShow = true
       // 3.显示倒计时
       } catch (error) {

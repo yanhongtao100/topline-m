@@ -67,3 +67,29 @@ export const deleteLike = (target) => {
 
   })
 }
+// 获取当前文章列表
+export const getCurrentUserArticles = () => {
+  return request({
+    method: 'get',
+    url: `/app/v1_0/user/articles`
+
+  })
+}
+// 获取用户收藏列表
+export const getCollectArticles = (params) => {
+  return request({
+    method: 'get',
+    url: `/app/v1_0/article/collections`,
+    params
+
+  })
+}
+// 获取用户历史记录
+export const getHistoryArticles = (params) => {
+  return request({
+    method: 'get',
+    url: `/app/v1_0/user/histories`,
+    params
+
+  })
+}

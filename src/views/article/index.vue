@@ -10,19 +10,14 @@
     <!-- /导航栏 -->
 
     <!-- 加载中 -->
-    <van-loading
-      class="loading"
-      color="#1989fa"
-      vertical
-      v-if="loading"
-    >
+    <van-loading class="loading" color="#1989fa" vertical v-if="loading">
       <slot>加载中...</slot>
     </van-loading>
     <!-- /加载中 -->
 
     <!-- 文章详情 -->
     <div class="detail" v-else-if="article.title">
-      <h3 class="title">{{article.title}}</h3>
+      <h3 class="title">{{ article.title }}</h3>
       <div class="author-wrap">
         <div class="base-info">
           <van-image
@@ -32,39 +27,39 @@
             :src="article.aut_photo"
           />
           <div class="text">
-            <p class="name">{{article.aut_name}}</p>
-            <p class="time">{{article.pubdate |relativeTime}}</p>
+            <p class="name">{{ article.aut_name }}</p>
+            <p class="time">{{ article.pubdate | relativeTime }}</p>
           </div>
         </div>
         <van-button
-        v-if="!user||article.aut_id!==user.id"
-         class="follow-btn"
-          :type="article.is_followed ?'default':'info'"
+          v-if="!user || article.aut_id !== user.id"
+          class="follow-btn"
+          :type="article.is_followed ? 'default' : 'info'"
           size="small"
           round
           :loading="isFollowLoading"
           @click="onFollow"
-        >{{article.is_followed?"已关注":'+ 关注'}}</van-button>
+          >{{ article.is_followed ? "已关注" : "+ 关注" }}</van-button
+        >
       </div>
-      <div class="markdown-body" v-html="article.content">
-
-      </div>
+      <div class="markdown-body" v-html="article.content"></div>
       <!-- 文章评论 star-->
-      <article-comment :article-id="articleId"></article-comment>
+      <article-comment
+        :article-id="articleId"
+        ref="article-comment"
+        @click-reply='onReplyShow'
+      ></article-comment>
       <!-- 文章评论end -->
     </div>
     <!-- /文章详情 -->
 
     <!-- 加载失败提示 -->
     <div class="error" v-else>
-      <img src="./no-network.png" alt="no-network">
+      <img src="./no-network.png" alt="no-network" />
       <p class="text">亲，网络不给力哦~</p>
-      <van-button
-        class="btn"
-        type="default"
-        size="small"
-        @click="loadArticle()"
-      >点击重试</van-button>
+      <van-button class="btn" type="default" size="small" @click="loadArticle()"
+        >点击重试</van-button
+      >
     </div>
     <!-- /加载失败提示 -->
 
@@ -75,36 +70,44 @@
         type="default"
         round
         size="small"
-        @click="isPostShow=true"
-      >写评论</van-button>
-      <van-icon
-        class="comment-icon"
-        name="comment-o"
-        info="9"
-      />
+        @click="isPostShow = true"
+        >写评论</van-button
+      >
+      <van-icon class="comment-icon" name="comment-o" info="9" />
       <van-icon
         color="orange"
-        :name="article.is_collected?'star':'star-o'"
+        :name="article.is_collected ? 'star' : 'star-o'"
         @click="onCollect()"
       />
       <van-icon
         color="#e5645f"
-        :name="article.attitude===1? 'good-job'  :'good-job-o' "
+        :name="article.attitude === 1 ? 'good-job' : 'good-job-o'"
         @click="onLike"
       />
       <van-icon class="share-icon" name="share" />
     </div>
     <!-- /底部区域 -->
 
-    <!-- 弹层 -->
+    <!-- 发布文章评论弹层 -->
     <van-popup
-  v-model="isPostShow"
-  position="bottom"
-  :style="{ height: '20%' }"
->
-<post-comment v-model="postMessage" @click-post="onPost"></post-comment>
-</van-popup>
-    <!-- 弹层 -->
+      v-model="isPostShow"
+      position="bottom"
+      :style="{ height: '20%' }"
+    >
+      <post-comment v-model="postMessage" @click-post="onPost"
+      ></post-comment>
+    </van-popup>
+    <!-- 发布文章评论弹层 -->
+
+    <!-- 评论回复弹层 -->
+    <van-popup
+      v-model="isReplyShow"
+      position="bottom"
+      :style="{ height: '90%' }"
+    >
+    <comment-reply :comment='currentComment' :article-id='articleId' v-if="isReplyShow" @close-reply="isReplyShow = false"></comment-reply>
+    </van-popup>
+    <!-- 评论回复弹层 -->
   </div>
 </template>
 
@@ -120,13 +123,15 @@ import { mapState } from 'vuex'
 import { deleteFollow, addFollow } from '@/api/user'
 import ArticleComment from './components/article-commentes'
 import PostComment from './components/post-comment'
+import CommentReply from './components/comment-reply'
 import { addComment } from '@/api/comment'
 
 export default {
   name: 'ArticlePage',
   components: {
     ArticleComment,
-    PostComment
+    PostComment,
+    CommentReply
   },
   props: {
     articleId: {
@@ -140,19 +145,19 @@ export default {
       loading: true, // 文章加载中的状态
       isFollowLoading: false,
       isPostShow: false,
-      postMessage: ''
+      postMessage: '',
+      isReplyShow: false,
+      currentComment: {}// 点击回复的那个评论项
     }
   },
   computed: {
     ...mapState(['user'])
-
   },
   watch: {},
   created () {
     this.loadArticle()
   },
-  mounted () {
-  },
+  mounted () {},
   methods: {
     async loadArticle () {
       this.loading = true
@@ -169,7 +174,7 @@ export default {
       this.$toast.loading({
         duration: 0, // 0为持续展示toast
         message: '请稍后...',
-        forbidClick: true // 是否禁止北京点击
+        forbidClick: true // 是否禁止背景点击
       })
       try {
         if (this.article.is_collected) {
@@ -221,20 +226,31 @@ export default {
       this.isFollowLoading = false
     },
     async onPost () {
+      // 3.开启登录loading
+      this.$toast.loading({
+        duration: 0, // 0为持续展示toast
+        message: '发布中',
+        forbidClick: true // 是否禁止北京点击
+      })
       try {
         const { data } = await addComment({
           target: this.articleId,
           content: this.postMessage
         })
-        console.log(data)
+
         this.$toast.success('发布成功')
         this.postMessage = ''
         this.isPostShow = false
+        this.$refs['article-comment'].list.unshift(data.data.new_obj)
       } catch (error) {
         this.$toast.success('发布失败')
         this.postMessage = ''
         this.isPostShow = false
       }
+    },
+    onReplyShow (comment) {
+      this.currentComment = comment
+      this.isReplyShow = true
     }
   }
 }
@@ -255,7 +271,7 @@ export default {
       margin: 0;
       padding-top: 24px;
       font-size: 20px;
-      color: #3A3A3A;
+      color: #3a3a3a;
     }
     .author-wrap {
       display: flex;

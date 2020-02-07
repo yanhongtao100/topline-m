@@ -1,43 +1,39 @@
 <template>
-  <div class="article-comments">
+  <div class="">
     <van-list
       v-model="loading"
       :finished="finished"
       finished-text="没有更多了"
       @load="onLoad"
     >
-      <comment-item
-      @click-reply="$emit('click-reply',$event)"
-      v-for="(item,index) in list"
-       :key="index"
-       :comment="item"
-        />
 
+      <van-cell v-for="(item,index) in list"
+      :key="index"
+      @click="$router.push({
+          name:'article',
+          params:{
+              articleId:item.art_id.toString()
+          }
+      })"
+      :title="item.title"
+       />
     </van-list>
   </div>
 </template>
 
 <script>
-import { getComments } from '@/api/comment'
-import CommentItem from './comment-item'
+import { getCollectArticles } from '@/api/article'
 export default {
-  name: 'ArticleComment',
-  components: {
-    CommentItem
-  },
-  props: {
-    articleId: {
-      type: [Number, String, Object],
-      required: true
-    }
-  },
+  name: 'UserArticle',
+  components: {},
+  props: {},
   data () {
     return {
       list: [],
       loading: false,
       finished: false,
-      offset: null,
-      limit: 20
+      page: 1,
+      perPage: 10
     }
   },
   created () {},
@@ -47,12 +43,9 @@ export default {
   beforeRouteUpdate () {},
   methods: {
     async onLoad () {
-      // 异步更新数据
-      const { data } = await getComments({
-        type: 'a',
-        source: this.articleId,
-        offset: this.offset,
-        limit: this.limit
+      const { data } = await getCollectArticles({
+        page: this.page,
+        per_page: this.perPage
       })
       const { results } = data.data
       this.list.push(...results)
@@ -60,7 +53,7 @@ export default {
       this.loading = false
 
       if (results.length) {
-        this.offset = data.data.last_id
+        this.page++
       } else {
         this.finished = true
       }
