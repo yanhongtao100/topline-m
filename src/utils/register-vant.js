@@ -2,7 +2,7 @@ import Vue from 'vue'
 import { CellGroup, Cell, Button, NavBar, Field, Toast,
   CountDown, Tabbar, TabbarItem, Image, Grid, GridItem,
   Icon, Dialog, List, Tab, Tabs, PullRefresh, Popup, Search,
-  Loading, ActionSheet, DatetimePicker
+  Loading, ActionSheet, DatetimePicker, Sidebar, SidebarItem
 } from 'vant'
 
 Vue.use(Button)
@@ -28,3 +28,5 @@ Vue.use(Button)
   .use(Loading)
   .use(ActionSheet)
   .use(DatetimePicker)
+  .use(Sidebar)
+  .use(SidebarItem)

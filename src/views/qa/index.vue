@@ -1,13 +1,33 @@
 <template>
-  <div class="qa-container">qa</div>
+  <div>
+qu
+  </div>
 </template>
 
 <script>
 export default {
-  name: 'QaPage'
+  name: '',
+  components: {},
+  props: {},
+  data () {
+    return {
+
+    }
+  },
+  created () {},
+  mounted () {},
+  activited () {},
+  update () {},
+  beforeRouteUpdate () {},
+  methods: {
+
+  },
+  filter: {},
+  computed: {},
+  watch: {}
 }
 </script>
 
-<style>
+<style lang="less" scoped>
 
 </style>
