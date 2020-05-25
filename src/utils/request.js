@@ -52,13 +52,15 @@ request.interceptors.response.use(function (response) {
           Authorization: `Bearer ${user.refresh_token}`
         }
       })
-      user.token = data.data.token
-      store.commit('setUser', user)
+      store.commit('setUser', {
+        ...user,
+        token: data.data.token
+      })
 
       return request(error.config)
     } catch (error) {
+      console.log(error)
       redirenctLogin()
-      // router.push('/login')
     }
   }
   return Promise.reject(error)
@@ -66,7 +68,7 @@ request.interceptors.response.use(function (response) {
 
 function redirenctLogin () {
   router.push({
-    name: 'tab-bar',
+    name: '/login',
     query: {
       redirect: router.currentRoute.fullPath
     }
